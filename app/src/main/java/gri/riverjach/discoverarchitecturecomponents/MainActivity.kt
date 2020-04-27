@@ -7,6 +7,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var videoPlayer: VideoPlayer
     private lateinit var videoPlayerCompoment: VideoPlayerCompoment
+    private lateinit var myLocationListener: MyLocationListener
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -18,6 +19,9 @@ class MainActivity : AppCompatActivity() {
         // Il faut ajouter un abonement à l'observer pour le videoPlayerCompoment
         videoPlayerCompoment = VideoPlayerCompoment(lifecycle)
         lifecycle.addObserver(videoPlayerCompoment)
+
+        myLocationListener = MyLocationListener(lifecycle)
+        lifecycle.addObserver(myLocationListener)
     }
 
     // Ajout de la surcharge que pour l'exemple du videoPlayer sans lifeCycle
