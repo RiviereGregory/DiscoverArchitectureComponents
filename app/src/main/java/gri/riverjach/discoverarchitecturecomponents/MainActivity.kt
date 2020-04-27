@@ -20,6 +20,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var myLocationListener: MyLocationListener
     private val myRegistry = MyRegistry()
     private val counter = MutableLiveData<Int>()
+    private lateinit var speedLiveData: SpeedLiveData
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,6 +61,16 @@ class MainActivity : AppCompatActivity() {
 
         counter.observe(this, observer)
         // Fin Utilisation du LiveData //
+
+        // Personalisation LiveData
+        val car = Car()
+        speedLiveData = SpeedLiveData(car)
+        speedLiveData.observe(this, Observer { speed ->
+            Log.w("MainActivity", "UPDATE UI with speed=$speed")
+        })
+
+        car.startEngine()
+        // Fin personalisation LiveData //
 
     }
 
