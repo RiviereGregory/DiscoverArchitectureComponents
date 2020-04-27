@@ -6,24 +6,28 @@ https://developer.android.com/topic/libraries/architecture/
 
 --------------------------------------
 
-**Lifecycle**  
+## Lifecycle  
 
-Simplifier le cycle de vie des Activity  
+Simplifier le cycle de vie des Activity  :
+
 ![Cycle de vie](/lifecycle-states.png)
 
 --------------------------------------
-**LiveData**
+## LiveData
 
 Rendre les données observables
 
 --------------------------------------
-**ViewModel**  
+## ViewModel  
 
-
---------------------------------------
-**Room**  
-
-Base de données 
+ViewModel résout les problèmes de changement d'orientation en gardant les données ou l'état.
 
 --------------------------------------
-**WorkManager**
+## Room  
+
+Permet de créer, requêter et manipuler plus facilement des bases de données SQLite 
+
+--------------------------------------
+## WorkManager
+
+Planificateur de tache de fond
