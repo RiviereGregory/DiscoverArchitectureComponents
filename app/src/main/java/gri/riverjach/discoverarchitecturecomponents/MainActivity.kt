@@ -21,6 +21,9 @@ class MainActivity : AppCompatActivity() {
     private val myRegistry = MyRegistry()
     private val counter = MutableLiveData<Int>()
     private lateinit var speedLiveData: SpeedLiveData
+    private val nameLiveData = MutableLiveData<String>()
+    private var nameIndex = 0
+    private lateinit var lengthLiveData: LiveData<Int>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -71,6 +74,26 @@ class MainActivity : AppCompatActivity() {
 
         car.startEngine()
         // Fin personalisation LiveData //
+
+        // transformation LiveData
+        updateNameButton.setOnClickListener {
+            nameLiveData.value = when (nameIndex) {
+                0 -> "Bob"
+                1 -> "Bobette"
+                2 -> "Alice"
+                else -> "Who?"
+            }
+            Log.i("MainActivity", "New name value=${nameLiveData.value}")
+            nameIndex = (nameIndex + 1) % 3
+        }
+        lengthLiveData = Transformations.map(nameLiveData) { name ->
+            Log.i("MainActivity", "Transforming string => int")
+            name.length
+        }
+        lengthLiveData.observe(this, Observer { length ->
+            nameLengthTextView.setText("New length: $length")
+        })
+        // Fin transformation LiveData //
 
     }
 
