@@ -1,10 +1,10 @@
 package gri.riverjach.discoverarchitecturecomponents
 
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.LifecycleRegistry
+import androidx.lifecycle.*
+import kotlinx.android.synthetic.main.activity_main.*
 
 class MyRegistry : LifecycleOwner {
     val lifecycleRegistry = LifecycleRegistry(this)
@@ -19,6 +19,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var videoPlayerCompoment: VideoPlayerCompoment
     private lateinit var myLocationListener: MyLocationListener
     private val myRegistry = MyRegistry()
+    private val counter = MutableLiveData<Int>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,6 +36,31 @@ class MainActivity : AppCompatActivity() {
 
         myLocationListener = MyLocationListener(lifecycle)
         lifecycle.addObserver(myLocationListener)
+
+        // Utilisation du LiveData
+        counter.value = 0
+        incrementButton.setOnClickListener {
+            counter.value = counter.value!! + 1
+            incrementTextView.setText(counter.value.toString())
+        }
+
+        // Version sans lambda
+        /*
+            val observer : Observer<Int> = object : Observer<Int>{
+                override fun onChanged(t: Int?) {
+                    Log.i("MainActivity", "New counter value=$t")
+                }
+
+            }
+        */
+        // Version Lambda
+        val observer: Observer<Int> = Observer { newValue ->
+            Log.i("MainActivity", "New counter value=$newValue")
+        }
+
+        counter.observe(this, observer)
+        // Fin Utilisation du LiveData //
+
     }
 
     // Ajout de la surcharge que pour l'exemple du videoPlayer sans lifeCycle
