@@ -1,6 +1,7 @@
 package gri.riverjach.discoverarchitecturecomponents
 
 import android.os.Bundle
+import android.os.SystemClock
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.*
@@ -11,6 +12,13 @@ class MyRegistry : LifecycleOwner {
     override fun getLifecycle(): Lifecycle {
         return lifecycleRegistry
     }
+}
+
+val timeLiveData = MutableLiveData<String>()
+
+fun getTimedName(name: String): LiveData<String> {
+    timeLiveData.value = "$name ${SystemClock.elapsedRealtime()}"
+    return timeLiveData
 }
 
 class MainActivity : AppCompatActivity() {
@@ -24,6 +32,7 @@ class MainActivity : AppCompatActivity() {
     private val nameLiveData = MutableLiveData<String>()
     private var nameIndex = 0
     private lateinit var lengthLiveData: LiveData<Int>
+    private lateinit var nameTimeLiveData: LiveData<String>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -94,6 +103,14 @@ class MainActivity : AppCompatActivity() {
             nameLengthTextView.setText("New length: $length")
         })
         // Fin transformation LiveData //
+        // SwitchMap LiveData (chainage des LiveData)
+        nameTimeLiveData = Transformations.switchMap(nameLiveData){name ->
+            getTimedName(name)
+        }
+        nameTimeLiveData.observe(this, Observer { nameTime ->
+            nameLengthTimeTextView.setText(nameTime)
+        })
+        // Fin SwitchMap LiveData //
 
     }
 
