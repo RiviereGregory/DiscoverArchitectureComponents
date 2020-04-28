@@ -33,6 +33,8 @@ class MainActivity : AppCompatActivity() {
     private var nameIndex = 0
     private lateinit var lengthLiveData: LiveData<Int>
     private lateinit var nameTimeLiveData: LiveData<String>
+    private lateinit var connectivityLiveData: ConnectivityLiveData
+    private lateinit var connectivityEnumLiveData: LiveData<Connectivity>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -104,13 +106,31 @@ class MainActivity : AppCompatActivity() {
         })
         // Fin transformation LiveData //
         // SwitchMap LiveData (chainage des LiveData)
-        nameTimeLiveData = Transformations.switchMap(nameLiveData){name ->
+        nameTimeLiveData = Transformations.switchMap(nameLiveData) { name ->
             getTimedName(name)
         }
         nameTimeLiveData.observe(this, Observer { nameTime ->
             nameLengthTimeTextView.setText(nameTime)
         })
         // Fin SwitchMap LiveData //
+        // TP Surveiller la connectivité avec un LiveData
+        connectivityLiveData = ConnectivityLiveData(this)
+        connectivityEnumLiveData = Transformations.map(connectivityLiveData) { connected ->
+            when (connected) {
+                true -> Connectivity.CONNECTED
+                else -> Connectivity.DISCONNECTED
+            }
+        }
+
+        // Version true/false
+        connectivityLiveData.observe(this, Observer { connected ->
+            Log.i("MainActivity", "Network connected=$connected")
+        })
+        // Version avec Enum
+        connectivityEnumLiveData.observe(this, Observer { connected ->
+            Log.i("MainActivity", "Network connected=$connected")
+        })
+        // Fin TP Surveiller la connectivité avec un LiveData //
 
     }
 
@@ -135,4 +155,9 @@ class MainActivity : AppCompatActivity() {
         // Change l'état du resgitry à Distroyed et envoie le nouvel Event
         myRegistry.lifecycleRegistry.setCurrentState(Lifecycle.State.DESTROYED)
     }
+}
+
+enum class Connectivity {
+    DISCONNECTED,
+    CONNECTED
 }
