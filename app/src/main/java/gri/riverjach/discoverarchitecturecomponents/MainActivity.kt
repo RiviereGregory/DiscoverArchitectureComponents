@@ -35,6 +35,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var nameTimeLiveData: LiveData<String>
     private lateinit var connectivityLiveData: ConnectivityLiveData
     private lateinit var connectivityEnumLiveData: LiveData<Connectivity>
+    private lateinit var viewModel: UserViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -132,6 +133,15 @@ class MainActivity : AppCompatActivity() {
         })
         // Fin TP Surveiller la connectivité avec un LiveData //
 
+        // test ViewModel
+        Log.d("MainActivity", "onCreate()")
+        viewModel = ViewModelProvider(this).get(UserViewModel::class.java)
+            // Test Fragment Attention
+        supportFragmentManager.beginTransaction()
+            .add(android.R.id.content, MainFragment())
+            .commit()
+        // Fin test ViewModel //
+
     }
 
     // Ajout de la surcharge que pour l'exemple du videoPlayer sans lifeCycle
@@ -154,6 +164,8 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
         // Change l'état du resgitry à Distroyed et envoie le nouvel Event
         myRegistry.lifecycleRegistry.setCurrentState(Lifecycle.State.DESTROYED)
+
+        Log.d("MainActivity", "onDestroy()")
     }
 }
 
