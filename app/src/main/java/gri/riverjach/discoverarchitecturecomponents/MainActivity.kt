@@ -152,13 +152,38 @@ class MainActivity : AppCompatActivity() {
         // Test ViewModel et State
         viewModel.user.observe(this, Observer { state ->
             textView.text = state!!.user?.name
-            button.visibility = if(state.buttonVisibility) View.VISIBLE else View.INVISIBLE
+            button.visibility = if (state.buttonVisibility) View.VISIBLE else View.INVISIBLE
             errorMessageTextView.text = state.errorMessage
         })
 
         viewModel.loadUser(1)
+
+        // Avec le state Sealed
+        viewModel.userSealed.observe(this, Observer { updateUI(it!!) })
+        viewModel.loadUserSealed(2)
+
         // Fin test ViewModel //
 
+    }
+
+    private fun updateUI(state: MyViewModelStateSealed) {
+        return when (state) {
+            is MyViewModelLoading -> {
+                textView.text = "Loading..."
+                button.visibility = if (state.buttonVisibility) View.VISIBLE else View.INVISIBLE
+                errorMessageTextView.text = state.errorMessage
+            }
+            is MyViewModelSucces -> {
+                textView.text = state!!.user?.name
+                button.visibility = if (state.buttonVisibility) View.VISIBLE else View.INVISIBLE
+                errorMessageTextView.visibility = View.INVISIBLE
+            }
+            is MyViewModelError -> {
+                button.visibility = if (state.buttonVisibility) View.VISIBLE else View.INVISIBLE
+                errorMessageTextView.visibility = View.VISIBLE
+                errorMessageTextView.text = state.errorMessage
+            }
+        }
     }
 
     // Ajout de la surcharge que pour l'exemple du videoPlayer sans lifeCycle
