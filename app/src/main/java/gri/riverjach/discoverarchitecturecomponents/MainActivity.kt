@@ -3,6 +3,7 @@ package gri.riverjach.discoverarchitecturecomponents
 import android.os.Bundle
 import android.os.SystemClock
 import android.util.Log
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.*
 import kotlinx.android.synthetic.main.activity_main.*
@@ -142,9 +143,20 @@ class MainActivity : AppCompatActivity() {
             .commit()
 
         // Test ViewModel avec LiveData
+        /*
         viewModel.getUser(1).observe(this, Observer { user ->
             Log.i("MainActivity", "UI Received user=$user")
         })
+        */
+
+        // Test ViewModel et State
+        viewModel.user.observe(this, Observer { state ->
+            textView.text = state!!.user?.name
+            button.visibility = if(state.buttonVisibility) View.VISIBLE else View.INVISIBLE
+            errorMessageTextView.text = state.errorMessage
+        })
+
+        viewModel.loadUser(1)
         // Fin test ViewModel //
 
     }

@@ -37,8 +37,9 @@ class ExampleUnitTest {
     fun shouldLoadUserWithIdEquals_1() {
         val viewModel = UserViewModel()
         val userId = 1
-        val liveData = viewModel.getUser(userId)
+        val liveData = viewModel.loadUser(userId)
+        val myViewModelState = viewModel.user.value
 
-        assertEquals(userId, liveData.value!!.id)
+        assertEquals(userId, myViewModelState!!.user?.id)
     }
 }
