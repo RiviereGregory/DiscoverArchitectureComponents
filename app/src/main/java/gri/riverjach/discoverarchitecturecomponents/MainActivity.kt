@@ -136,10 +136,15 @@ class MainActivity : AppCompatActivity() {
         // test ViewModel
         Log.d("MainActivity", "onCreate()")
         viewModel = ViewModelProvider(this).get(UserViewModel::class.java)
-            // Test Fragment Attention
+        // Test Fragment Attention
         supportFragmentManager.beginTransaction()
             .add(android.R.id.content, MainFragment())
             .commit()
+
+        // Test ViewModel avec LiveData
+        viewModel.getUser(1).observe(this, Observer { user ->
+            Log.i("MainActivity", "UI Received user=$user")
+        })
         // Fin test ViewModel //
 
     }
