@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.os.SystemClock
 import android.util.Log
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.*
 import kotlinx.android.synthetic.main.activity_main.*
@@ -37,6 +38,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var connectivityLiveData: ConnectivityLiveData
     private lateinit var connectivityEnumLiveData: LiveData<Connectivity>
     private lateinit var viewModel: UserViewModel
+    private lateinit var loginViewModel: LoginViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -162,8 +164,32 @@ class MainActivity : AppCompatActivity() {
         viewModel.userSealed.observe(this, Observer { updateUI(it!!) })
         viewModel.loadUserSealed(2)
 
+        // Exercice login
+        loginViewModel = ViewModelProvider(this).get(LoginViewModel::class.java)
+        loginViewModel.getState().observe(this, Observer { upadteLoginUI(it!!) })
+
+        loginButton.setOnClickListener{
+            val username = userNameEditText.text.toString()
+            val password = passwordEditText.text.toString()
+            loginViewModel.login(username,password)
+        }
         // Fin test ViewModel //
 
+    }
+
+    private fun upadteLoginUI(state: LoginViewModelState) {
+        return when (state) {
+            LoginViewModelStateSucces -> {
+                errorMessageLoginTextView.visibility = View.INVISIBLE
+                loginButton.isEnabled = state.loginButtonEnable
+                Toast.makeText(this, "Logged! Loading next activity...", Toast.LENGTH_SHORT).show()
+            }
+            is LoginViewModelStateError -> {
+                loginButton.isEnabled = state.loginButtonEnable
+                errorMessageLoginTextView.visibility = View.VISIBLE
+                errorMessageLoginTextView.text = state.errorMessage
+            }
+        }
     }
 
     private fun updateUI(state: MyViewModelStateSealed) {
