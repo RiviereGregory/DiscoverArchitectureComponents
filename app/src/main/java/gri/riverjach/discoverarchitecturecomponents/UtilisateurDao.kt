@@ -1,5 +1,6 @@
 package gri.riverjach.discoverarchitecturecomponents
 
+import androidx.lifecycle.LiveData
 import androidx.room.*
 
 @Dao
@@ -57,4 +58,19 @@ interface UtilisateurDao {
      */
     @Delete
     fun deleteUtilisateurs(vararg utilisateurs: Utilisateur): Array<Int>
+
+    /**
+     * dao.getAllUtilisateurs().observe(this, Observer { utilisateurs -> ... })
+     */
+    @Query("SELECT * FROM utilisateur")
+    fun getAllUtilisateurs(): LiveData<List<Utilisateur>>
+
+    /**
+     * dao.getUserById(3).observe(this, Observer { utilisateur -> ... })
+     * on a LiveData car room fait de l'asynchrone donc on observe.
+     */
+    @Query("SELECT * FROM utilisateur WHERE id= :id")
+    fun getUserById(id: Int): LiveData<Utilisateur>
+
+
 }
