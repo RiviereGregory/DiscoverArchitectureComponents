@@ -3,6 +3,8 @@ package gri.riverjach.discoverarchitecturecomponents
 import androidx.lifecycle.LiveData
 import androidx.room.*
 
+data class NameAgeTuple(val name: String, val age: Int)
+
 @Dao
 interface UtilisateurDao {
 
@@ -70,7 +72,15 @@ interface UtilisateurDao {
      * on a LiveData car room fait de l'asynchrone donc on observe.
      */
     @Query("SELECT * FROM utilisateur WHERE id= :id")
-    fun getUserById(id: Int): LiveData<Utilisateur>
+    fun getUtilisateurById(id: Int): LiveData<Utilisateur>
 
+    @Query("SELECT * FROM utilisateur WHERE name LIKE :name AND age > :minAge")
+    fun getUtilisateursByNameAndOlderThan(name: String, minAge: Int): LiveData<List<Utilisateur>>
+
+    @Query("SELECT * FROM utilisateur WHERE name IN (:name)")
+    fun getUtilisateursFromNames(name: List<String>): LiveData<List<Utilisateur>>
+
+    @Query("SELECT name, age FROM utilisateur")
+    fun getNameAgeTuple(): LiveData<List<NameAgeTuple>>
 
 }
