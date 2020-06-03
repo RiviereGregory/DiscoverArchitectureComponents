@@ -9,7 +9,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 abstract class AppDatabase : RoomDatabase() {
     abstract fun userDao(): UserDao
     abstract fun folderDao(): FolderDao
-    abstract fun BookmarkDao(): BookmarkDao
+    abstract fun bookmarkDao(): BookmarkDao
 }
 
 val MIGRATION_1_2 = object : Migration(1, 2) {
