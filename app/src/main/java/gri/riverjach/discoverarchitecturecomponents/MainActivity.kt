@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.*
 import kotlinx.android.synthetic.main.activity_main.*
+import java.util.concurrent.Executors
 
 class MyRegistry : LifecycleOwner {
     val lifecycleRegistry = LifecycleRegistry(this)
@@ -43,6 +44,23 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        // Utilisation de RoomDatabse
+        val userDao = App.database.userDao()
+
+        // faire un thread car on ne peut pas utiliser room
+        // dans le thread principal pour faire des opération sur la BDD
+        Executors.newSingleThreadExecutor().execute{
+            userDao.insertUser(User(0, "Bob", 10))
+            userDao.insertUser(User(0, "Bobette", 19))
+        }
+
+
+        userDao.getAllUsers().observe(this, Observer { users ->
+            Log.i("MainActivity", "users=$users")
+        })
+
+        // Fin Utilisation de RoomDatabse
 
         // Exemple sans lifecycle
         videoPlayer = VideoPlayer()
@@ -168,10 +186,10 @@ class MainActivity : AppCompatActivity() {
         loginViewModel = ViewModelProvider(this).get(LoginViewModel::class.java)
         loginViewModel.getState().observe(this, Observer { upadteLoginUI(it!!) })
 
-        loginButton.setOnClickListener{
+        loginButton.setOnClickListener {
             val username = userNameEditText.text.toString()
             val password = passwordEditText.text.toString()
-            loginViewModel.login(username,password)
+            loginViewModel.login(username, password)
         }
         // Fin test ViewModel //
 
