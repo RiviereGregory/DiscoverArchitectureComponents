@@ -17,6 +17,21 @@ data class Company(
 )
 
 @Entity(
+    foreignKeys = [ForeignKey(
+        entity = Utilisateur::class,
+        parentColumns = ["id"],
+        childColumns = ["userId"]
+    )
+    ]
+)
+data class Note(
+    @PrimaryKey(autoGenerate = true)
+    var id: Int,
+    var userId: Long,
+    var text: String
+)
+
+@Entity(
     tableName = "users",
     indices = [
         Index(value = ["name", "age"], unique = true)
