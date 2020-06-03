@@ -39,7 +39,7 @@ class UserViewModel : ViewModel() {
         handler.postDelayed({ userSealed.value = MyViewModelError("Could not load user") }, 4000)
     }
 
-    private fun fakeUser(userId: Int): User = User(userId, "Bob $userId", userId + 20)
+    private fun fakeUser(userId: Int): User = User(userId, "Bob $userId", userId + 20,"")
 
     /*
     private val user = MutableLiveData<User>()

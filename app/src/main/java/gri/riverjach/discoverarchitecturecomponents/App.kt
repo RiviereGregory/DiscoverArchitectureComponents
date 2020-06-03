@@ -11,6 +11,7 @@ class App: Application() {
     override fun onCreate() {
         super.onCreate()
         database = Room.databaseBuilder(this, AppDatabase::class.java, "databaseName")
+            .addMigrations(MIGRATION_1_2)
             .build()
     }
 }

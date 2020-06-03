@@ -51,8 +51,8 @@ class MainActivity : AppCompatActivity() {
         // faire un thread car on ne peut pas utiliser room
         // dans le thread principal pour faire des opération sur la BDD
         Executors.newSingleThreadExecutor().execute{
-            userDao.insertUser(User(0, "Bob", 10))
-            userDao.insertUser(User(0, "Bobette", 19))
+            userDao.insertUser(User(0, "Bob", 10,"bob@meil.f"))
+            userDao.insertUser(User(0, "Bobette", 19,"bobette@meil.f"))
         }
 
 
