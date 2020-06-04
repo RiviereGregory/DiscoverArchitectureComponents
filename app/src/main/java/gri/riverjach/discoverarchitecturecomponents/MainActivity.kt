@@ -9,12 +9,10 @@ import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.*
-import androidx.work.Constraints
-import androidx.work.NetworkType
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkManager
+import androidx.work.*
 import kotlinx.android.synthetic.main.activity_main.*
 import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 
 class MyRegistry : LifecycleOwner {
     val lifecycleRegistry = LifecycleRegistry(this)
@@ -53,31 +51,52 @@ class MainActivity : AppCompatActivity() {
 
         // Debut Worker
 
+        val workManager = WorkManager.getInstance(applicationContext)
+        // Annuler toute les taches
+        workManager.cancelAllWork()
+
         // Ajout de contrainte
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .setRequiresCharging(true)
             .build()
+//        val work = OneTimeWorkRequestBuilder<TestWorker>()
+//            .setConstraints(constraints)
+//            .build()
+
         // Tache unique
         val work = OneTimeWorkRequestBuilder<TestWorker>()
-            .setConstraints(constraints)
+            .setInitialDelay(5, TimeUnit.SECONDS)
             .build()
 
         // Tache périodique (Valeur minimun 15 mininutes)
 //        val work = PeriodicWorkRequestBuilder<TestWorker>(30, TimeUnit.MINUTES)
 //            .build()
 
+        val startTime = SystemClock.elapsedRealtime()
         // Met le worker dans la queue pour une exécution unique
-        WorkManager.getInstance(applicationContext).enqueue(work)
+        //workManager.enqueue(work)
 
+        // Gestion des taches si la tache est en cour on peut la remplacer
+        workManager.beginUniqueWork("testWorker", ExistingWorkPolicy.REPLACE, work)
         // Vérification du status du worker
-        WorkManager.getInstance(applicationContext).getWorkInfoByIdLiveData(work.id)
+        workManager.getWorkInfoByIdLiveData(work.id)
             .observe(this, Observer { workStatus ->
                 Log.i("MainActivity", "workStatus=$workStatus")
 
                 if (workStatus != null && !workStatus.state.isFinished) {
                     Log.d("MainActivity", "Not yet finished")
                 }
+
+                val elapsedTime = SystemClock.elapsedRealtime() - startTime
+
+                workStatus?.let {
+                    if (it.state == WorkInfo.State.RUNNING && elapsedTime > 3000) {
+                        Log.w("MainActivity", "More than $elapsedTime msec, cancelling task")
+                        workManager.cancelWorkById(it.id)
+                    }
+                }
+
             })
 
 
