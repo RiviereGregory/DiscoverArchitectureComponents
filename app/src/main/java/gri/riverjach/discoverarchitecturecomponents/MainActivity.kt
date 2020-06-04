@@ -32,7 +32,25 @@ inline fun <reified T : Worker> builWork(): OneTimeWorkRequest {
         .build()
 }
 
+fun builPrimeWorker(low: Int, high: Int): OneTimeWorkRequest {
+    val constraints = Constraints.Builder()
+        .setRequiresCharging(true)
+        .build()
+    return OneTimeWorkRequestBuilder<PrimeWorker>()
+        .setInputData(
+            workDataOf(
+                KEY_LOW_NUMBER to low,
+                KEY_HIGH_NUMBER to high
+            )
+        ).setConstraints(constraints)
+        .build()
+}
+
 class MainActivity : AppCompatActivity() {
+
+    companion object {
+        val primeNumbers = mutableListOf<Int>()
+    }
 
     private lateinit var videoPlayer: VideoPlayer
     private lateinit var videoPlayerCompoment: VideoPlayerCompoment
@@ -152,6 +170,27 @@ class MainActivity : AppCompatActivity() {
         })
 
         // Fin Worker
+
+        // TP Nombres premier
+        workManager.cancelAllWork()
+
+        val constraintsTP = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+
+        val uploadWorker = OneTimeWorkRequestBuilder<UploadPrimeWorker>()
+            .setConstraints(constraintsTP)
+            .build()
+
+        var worksTP: List<OneTimeWorkRequest> = arrayListOf(
+            builPrimeWorker(1, 1000),
+            builPrimeWorker(2000, 10000)
+        )
+        workManager.beginWith(worksTP)
+            .then(uploadWorker)
+            .enqueue()
+
+        // Fin TP Nombres premier
 
         // TP FOLDER
         findViewById<Button>(R.id.start_activity_folder_button).setOnClickListener {
