@@ -9,11 +9,12 @@ import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.*
-import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.Constraints
+import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import kotlinx.android.synthetic.main.activity_main.*
 import java.util.concurrent.Executors
-import java.util.concurrent.TimeUnit
 
 class MyRegistry : LifecycleOwner {
     val lifecycleRegistry = LifecycleRegistry(this)
@@ -51,13 +52,20 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         // Debut Worker
+
+        // Ajout de contrainte
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .setRequiresCharging(true)
+            .build()
         // Tache unique
-//        val work = OneTimeWorkRequestBuilder<TestWorker>()
-//            .build()
+        val work = OneTimeWorkRequestBuilder<TestWorker>()
+            .setConstraints(constraints)
+            .build()
 
         // Tache périodique (Valeur minimun 15 mininutes)
-        val work = PeriodicWorkRequestBuilder<TestWorker>(30, TimeUnit.MINUTES)
-            .build()
+//        val work = PeriodicWorkRequestBuilder<TestWorker>(30, TimeUnit.MINUTES)
+//            .build()
 
         // Met le worker dans la queue pour une exécution unique
         WorkManager.getInstance(applicationContext).enqueue(work)
