@@ -134,6 +134,22 @@ class MainActivity : AppCompatActivity() {
 //
 //            })
 
+        // Parametre tache
+        workManager.cancelAllWork()
+        val data = workDataOf(KEY_SLEEP_DURATION to 300L)
+
+        val work = OneTimeWorkRequestBuilder<LongWorker>()
+            .setInputData(data)
+            .build()
+        workManager.beginWith(work).enqueue()
+
+        // recupération des données
+        workManager.getWorkInfoByIdLiveData(work.id).observe(this, Observer { status ->
+            if (status != null && status.state.isFinished) {
+                val sleepQuality = status.outputData.getString(KEY_RESULT)
+                Log.i("MainActivity", "How did you sleep? $sleepQuality")
+            }
+        })
 
         // Fin Worker
 

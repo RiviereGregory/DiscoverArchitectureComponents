@@ -11,7 +11,7 @@ class WorkerA(appContext: Context, workerParams: WorkerParameters) :
         Log.i("WorkerA", "Starting hard work...")
         Thread.sleep(2000)
         Log.i("WorkerA", "Work finished")
-        return return Result.success()
+        return Result.success()
     }
 }
 
@@ -21,7 +21,7 @@ class WorkerB(appContext: Context, workerParams: WorkerParameters) :
         Log.i("WorkerB", "Starting hard work...")
         Thread.sleep(2000)
         Log.i("WorkerB", "Work finished")
-        return return Result.success()
+        return Result.success()
     }
 }
 
@@ -31,6 +31,6 @@ class WorkerC(appContext: Context, workerParams: WorkerParameters) :
         Log.i("WorkerC", "Starting hard work...")
         Thread.sleep(2000)
         Log.i("WorkerC", "Work finished")
-        return return Result.success()
+        return Result.success()
     }
 }
