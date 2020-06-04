@@ -9,10 +9,11 @@ import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.*
-import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import kotlinx.android.synthetic.main.activity_main.*
 import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 
 class MyRegistry : LifecycleOwner {
     val lifecycleRegistry = LifecycleRegistry(this)
@@ -50,8 +51,14 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         // Debut Worker
-        val work = OneTimeWorkRequestBuilder<TestWorker>()
+        // Tache unique
+//        val work = OneTimeWorkRequestBuilder<TestWorker>()
+//            .build()
+
+        // Tache périodique (Valeur minimun 15 mininutes)
+        val work = PeriodicWorkRequestBuilder<TestWorker>(30, TimeUnit.MINUTES)
             .build()
+
         // Met le worker dans la queue pour une exécution unique
         WorkManager.getInstance(applicationContext).enqueue(work)
 
@@ -60,7 +67,7 @@ class MainActivity : AppCompatActivity() {
             .observe(this, Observer { workStatus ->
                 Log.i("MainActivity", "workStatus=$workStatus")
 
-                if(workStatus != null && !workStatus.state.isFinished){
+                if (workStatus != null && !workStatus.state.isFinished) {
                     Log.d("MainActivity", "Not yet finished")
                 }
             })
