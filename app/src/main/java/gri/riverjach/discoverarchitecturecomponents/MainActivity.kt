@@ -12,7 +12,6 @@ import androidx.lifecycle.*
 import androidx.work.*
 import kotlinx.android.synthetic.main.activity_main.*
 import java.util.concurrent.Executors
-import java.util.concurrent.TimeUnit
 
 class MyRegistry : LifecycleOwner {
     val lifecycleRegistry = LifecycleRegistry(this)
@@ -26,6 +25,11 @@ val timeLiveData = MutableLiveData<String>()
 fun getTimedName(name: String): LiveData<String> {
     timeLiveData.value = "$name ${SystemClock.elapsedRealtime()}"
     return timeLiveData
+}
+
+inline fun <reified T : Worker> builWork(): OneTimeWorkRequest {
+    return OneTimeWorkRequestBuilder<T>()
+        .build()
 }
 
 class MainActivity : AppCompatActivity() {
@@ -65,39 +69,70 @@ class MainActivity : AppCompatActivity() {
 //            .build()
 
         // Tache unique
-        val work = OneTimeWorkRequestBuilder<TestWorker>()
-            .setInitialDelay(5, TimeUnit.SECONDS)
-            .build()
+//        val work = OneTimeWorkRequestBuilder<TestWorker>()
+//            .setInitialDelay(5, TimeUnit.SECONDS)
+//            .build()
+
+        // Chainer les taches
+        val workA = builWork<WorkerA>()
+        val workB = builWork<WorkerB>()
+        val workC = builWork<WorkerC>()
+
+        // tahce l'une après l'autre
+        workManager.beginWith(workA)
+            .then(workB)
+            .enqueue()
+
+        // tache en //
+        var works: List<OneTimeWorkRequest> = arrayListOf(workA, workB, workC)
+        workManager.beginWith(works)
+            .enqueue()
+
+        // Chaine
+        val chainA = workManager
+            .beginWith(builWork<WorkerA>())
+            .then(builWork<WorkerA>())
+
+        var worksB: List<OneTimeWorkRequest> = arrayListOf(builWork<WorkerB>(), builWork<WorkerB>())
+        val chainB = workManager
+            .beginWith(worksB)
+
+        var continuations: List<WorkContinuation> = arrayListOf(chainA, chainB)
+        val chainC = WorkContinuation
+            .combine(continuations)
+            .then(builWork<WorkerC>())
+
+        chainC.enqueue()
 
         // Tache périodique (Valeur minimun 15 mininutes)
 //        val work = PeriodicWorkRequestBuilder<TestWorker>(30, TimeUnit.MINUTES)
 //            .build()
 
-        val startTime = SystemClock.elapsedRealtime()
+//        val startTime = SystemClock.elapsedRealtime()
         // Met le worker dans la queue pour une exécution unique
         //workManager.enqueue(work)
 
         // Gestion des taches si la tache est en cour on peut la remplacer
-        workManager.beginUniqueWork("testWorker", ExistingWorkPolicy.REPLACE, work)
+//        workManager.beginUniqueWork("testWorker", ExistingWorkPolicy.REPLACE, work)
         // Vérification du status du worker
-        workManager.getWorkInfoByIdLiveData(work.id)
-            .observe(this, Observer { workStatus ->
-                Log.i("MainActivity", "workStatus=$workStatus")
-
-                if (workStatus != null && !workStatus.state.isFinished) {
-                    Log.d("MainActivity", "Not yet finished")
-                }
-
-                val elapsedTime = SystemClock.elapsedRealtime() - startTime
-
-                workStatus?.let {
-                    if (it.state == WorkInfo.State.RUNNING && elapsedTime > 3000) {
-                        Log.w("MainActivity", "More than $elapsedTime msec, cancelling task")
-                        workManager.cancelWorkById(it.id)
-                    }
-                }
-
-            })
+//        workManager.getWorkInfoByIdLiveData(work.id)
+//            .observe(this, Observer { workStatus ->
+//                Log.i("MainActivity", "workStatus=$workStatus")
+//
+//                if (workStatus != null && !workStatus.state.isFinished) {
+//                    Log.d("MainActivity", "Not yet finished")
+//                }
+//
+//                val elapsedTime = SystemClock.elapsedRealtime() - startTime
+//
+//                workStatus?.let {
+//                    if (it.state == WorkInfo.State.RUNNING && elapsedTime > 3000) {
+//                        Log.w("MainActivity", "More than $elapsedTime msec, cancelling task")
+//                        workManager.cancelWorkById(it.id)
+//                    }
+//                }
+//
+//            })
 
 
         // Fin Worker
